@@ -344,12 +344,13 @@ public final class PinyinHelper {
 	    //PinyinHelper.convertToPinyinString(str, ",", PinyinFormat.WITH_TONE_MARK); // nǐ,hǎo,shì,jiè
 	    //PinyinHelper.convertToPinyinString(str, ",", PinyinFormat.WITH_TONE_NUMBER); // ni3,hao3,shi4,jie4
 	    
+	    //获取多音字汉字首字线
             String strJcs = getMultiShortPinyin(str);
             System.out.println(strJcs);
 	    
-	    //获取全
+	    //获取多音字全拼
 	   // String strQuanpins = getMultiQuanpin(str);
-           // System.out.println(strQuanpins);
+       // System.out.println(strQuanpins);
 	}
 
 	public static String getMultiQuanpin(String str) {
