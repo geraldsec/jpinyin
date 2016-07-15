@@ -168,7 +168,14 @@ public final class PinyinHelper {
                 if (ChineseHelper.isChinese(c) || c == CHINESE_LING) {
                     String[] pinyinArray = convertToPinyinArray(str.charAt(i), pinyinFormat);
                     if (pinyinArray != null) {
-                        sb.append(pinyinArray[0]);
+                        for(int j=0; j<pinyinArray.length; j++)
+                        {
+                            sb.append(pinyinArray[j]);
+                            if(pinyinArray.length>1 && j<pinyinArray.length-1)
+                            {
+                                sb.append("/");
+                            }
+                        }
                     } else {
                         sb.append(str.charAt(i));
                     }
@@ -234,33 +241,74 @@ public final class PinyinHelper {
         String separator = "#"; // 使用#作为拼音分隔符
         StringBuilder sb = new StringBuilder();
 
-        char[] charArray = new char[str.length()];
+        //char[] charArray = new char[str.length()+100];
+        StringBuilder sbResult  = new StringBuilder();
         for (int i = 0, len = str.length(); i < len; i++) {
             char c = str.charAt(i);
 
             // 首先判断是否为汉字或者〇，不是的话直接将该字符返回
-            if (!ChineseHelper.isChinese(c) && c != CHINESE_LING) {
-                charArray[i] = c;
-            } else {
+            if (!ChineseHelper.isChinese(c) && c != CHINESE_LING) 
+            {
+                //charArray[i] = c;
+                sbResult.append(c);
+                sbResult.append(",");
+            }
+            else 
+            {
                 int j = i + 1;
                 sb.append(c);
 
                 // 搜索连续的汉字字符串
-                while (j < len && (ChineseHelper.isChinese(str.charAt(j)) || str.charAt(j) == CHINESE_LING)) {
+                while (j < len && (ChineseHelper.isChinese(str.charAt(j)) || str.charAt(j) == CHINESE_LING)) 
+                {
                     sb.append(str.charAt(j));
-                    j++;
+                    j++;                    
                 }
                 String hanziPinyin = convertToPinyinString(sb.toString(), separator, PinyinFormat.WITHOUT_TONE);
                 String[] pinyinArray = hanziPinyin.split(separator);
-                for (String string : pinyinArray) {
-                    charArray[i] = string.charAt(0);
+                for (int l=0; l<pinyinArray.length; l++) 
+                {
+                    String string = pinyinArray[l];
+                    if(string.contains("/"))
+                    {
+                        String[] multiPinyinArray = string.split("/");
+                        
+                        for(int k=0;k<multiPinyinArray.length; k++)
+                        {
+                            String string1 = multiPinyinArray[k];
+                            //charArray[i] = string1.charAt(0);
+                             sbResult.append(string1.charAt(0));
+                            //i++;                            
+                            if(k<multiPinyinArray.length-1)
+                            {
+                               //charArray[i] = '/';
+                               //i++;                                
+                                sbResult.append("/");
+                            }                           
+                        }                                
+                    }
+                    else
+                    {
+                       //charArray[i] = string.charAt(0);                                
+                       //i++;                    
+                        sbResult.append( string.charAt(0));
+                    }
+                    
+                    //if(l<pinyinArray.length-1)
+                    //{
+                       //charArray[i] = ',';                       
+                       //i++;                                            
+                        sbResult.append(",");
+                        
+                    //}
                     i++;
                 }
                 i--;
                 sb.setLength(0);
             }
         }
-        return String.valueOf(charArray);
+       // return String.valueOf(charArray);
+       return sbResult.toString();
     }
 
     public static void addPinyinDict(String path) {
@@ -289,4 +337,119 @@ public final class PinyinHelper {
             throw new PinyinException(e);
         }
     }
+    
+	public static void main(String[] args) {
+	    String str = "中国银行xgy大大5";
+	//	String str = "中国行乘乐了么因日";
+	    //PinyinHelper.convertToPinyinString(str, ",", PinyinFormat.WITH_TONE_MARK); // nǐ,hǎo,shì,jiè
+	    //PinyinHelper.convertToPinyinString(str, ",", PinyinFormat.WITH_TONE_NUMBER); // ni3,hao3,shi4,jie4
+	    
+            String strJcs = getMultiShortPinyin(str);
+            System.out.println(strJcs);
+	    
+	    //获取全
+	   // String strQuanpins = getMultiQuanpin(str);
+           // System.out.println(strQuanpins);
+	}
+
+	public static String getMultiQuanpin(String str) {
+	    String quanpin = PinyinHelper.convertToPinyinString(str, ",", PinyinFormat.WITHOUT_TONE).toUpperCase();
+	    //String quanpin = PinyinHelper.convertToPinyinString(str, "", PinyinFormat.WITH_TONE_MARK).toUpperCase();
+	   // System.out.println(quanpin);
+	    
+	    List<String> qpList = getStringList(quanpin);
+            StringBuffer sb2 = new StringBuffer();
+            for(int i = 0; i<qpList.size(); i++)
+            {
+                String s1 = qpList.get(i);
+                sb2.append(s1); 
+                if(i<qpList.size()-1)
+                {
+                    sb2.append(",");
+                }
+            }    	    
+            String strResult = sb2.toString();
+	    
+            return strResult;
+            
+	}
+
+	public  static String getMultiShortPinyin(String str) {
+		//System.out.println(str);
+		
+                //获取拼音首字母
+                String pyjc = PinyinHelper.getShortPinyin(str).toUpperCase(); // nhsj
+               // System.out.println(pyjc);
+		
+		List<String> jcList = getStringList(pyjc);
+		
+		StringBuffer sb = new StringBuffer();
+		int nLength = pyjc.split(",").length;
+		for(int i = 0; i<jcList.size(); i++)
+		{
+		    String s1 = jcList.get(i);
+		    s1 = s1.substring(0,nLength);
+		    //s1 = s1.replace("\s*", "");
+		    sb.append(s1); 
+		    if(i<jcList.size()-1)
+		    {
+		        sb.append(",");
+		    }
+		}
+		String pyjcResult = sb.toString();
+		//System.out.println(pyjcResult);
+                return pyjcResult;
+	}
+
+	private static List<String> getStringList(String pyjc) {
+		List<String> jcList = new ArrayList<String>();            
+		String strResult = "";
+		jcList.add(strResult);
+		String strs[] = pyjc.split(",");
+		for(String str1: strs)
+		{
+		    if(!str1.contains("/"))
+		    {
+		        for(int i=0; i<jcList.size(); i++)
+		        {
+		            strResult = jcList.get(i);
+		            strResult = strResult + str1;
+		            jcList.set(i,strResult);
+		        }
+		    }
+		    else
+		    {
+		        String strs1[] = str1.split("/");
+		        List<String> jcListTemp = new ArrayList<String>();  
+		        jcListTemp.addAll(jcList);
+
+		        for(int j=0; j<strs1.length; j++)
+		        {
+		            String str11 = strs1[j];
+		            if(j==0)
+		            {
+		                for(int i=0; i<jcList.size(); i++)
+		                {
+		                    strResult = jcList.get(i);
+		                    strResult = strResult + str11;
+		                    jcList.set(i,strResult);
+		                }
+		            }
+		            else
+		            {
+		                for(int i=0; i<jcListTemp.size(); i++)
+		                {
+		                    strResult = jcListTemp.get(i);
+		                    strResult = strResult + str11;
+		                    if(!jcList.contains(strResult))
+		                    {    
+		                        jcList.add(strResult);
+		                    }
+		                }                            
+		            }
+		        }
+		    }
+		}
+		return jcList;
+	}    
 }
