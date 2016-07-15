@@ -23,15 +23,18 @@ public final class PinyinHelper {
     private static final String ALL_UNMARKED_VOWEL = "aeiouv";
     private static final String ALL_MARKED_VOWEL = "āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ"; // 所有带声调的拼音字母
 
-    static {
-        for (String word : MUTIL_PINYIN_TABLE.keySet()) {
+    static 
+    {
+        for (String word : MUTIL_PINYIN_TABLE.keySet()) 
+        {
             dict.add(word);
         }
         Collections.sort(dict);
         DOUBLE_ARRAY_TRIE.build(dict);
     }
 
-    private PinyinHelper() {
+    private PinyinHelper() 
+    {
     }
 
     /**
@@ -41,7 +44,8 @@ public final class PinyinHelper {
      *            带声调格式的拼音
      * @return 数字代表声调格式的拼音
      */
-    private static String[] convertWithToneNumber(String pinyinArrayString) {
+    private static String[] convertWithToneNumber(String pinyinArrayString) 
+    {
         String[] pinyinArray = pinyinArrayString.split(PINYIN_SEPARATOR);
         for (int i = pinyinArray.length - 1; i >= 0; i--) {
             boolean hasMarkedChar = false;
