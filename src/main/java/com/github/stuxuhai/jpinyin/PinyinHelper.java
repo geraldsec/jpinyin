@@ -222,9 +222,11 @@ public final class PinyinHelper {
      *            汉字
      * @return 判断结果，是汉字返回true，否则返回false
      */
-    public static boolean hasMultiPinyin(char c) {
+    public static boolean hasMultiPinyin(char c) 
+    {
         String[] pinyinArray = convertToPinyinArray(c);
-        if (pinyinArray != null && pinyinArray.length > 1) {
+        if (pinyinArray != null && pinyinArray.length > 1) 
+        {
             return true;
         }
         return false;
